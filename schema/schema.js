@@ -38,6 +38,17 @@ const AddressType = new GraphQLObjectType({
   },
 });
 
+const CommentType = new GraphQLObjectType({
+  name: 'Comment',
+  fields: {
+    postId: { type: GraphQLString },
+    id: { type: GraphQLString },
+    name: { type: GraphQLString },
+    email: { type: GraphQLString },
+    body: { type: GraphQLString },
+  },
+});
+
 const PostsType = new GraphQLObjectType({
   name: 'Post',
   fields: {
@@ -45,6 +56,16 @@ const PostsType = new GraphQLObjectType({
     id: { type: GraphQLString },
     title: { type: GraphQLString },
     body: { type: GraphQLString },
+    comments: {
+      type: GraphQLList(CommentType),
+      resolve(parentValue, args) {
+        return axios
+          .get(`https://jsonplaceholder.typicode.com/comments`, {
+            params: { postId: parentValue.id },
+          })
+          .then((response) => response.data);
+      },
+    },
   },
 });
 
@@ -61,9 +82,9 @@ const UserType = new GraphQLObjectType({
       type: GraphQLList(PostsType),
       resolve(parentValue, args) {
         return axios
-          .get(
-            `https://jsonplaceholder.typicode.com/posts?userId=${parentValue.id}`
-          )
+          .get(`https://jsonplaceholder.typicode.com/posts`, {
+            params: { userId: parentValue.id },
+          })
           .then((response) => response.data);
       },
     },
