@@ -59,11 +59,10 @@ const UserType = new GraphQLObjectType({
     address: { type: AddressType },
     posts: {
       type: GraphQLList(PostsType),
-      args: { userId: { type: GraphQLString } },
       resolve(parentValue, args) {
         return axios
           .get(
-            `https://jsonplaceholder.typicode.com/posts?userId=${args.userId}`
+            `https://jsonplaceholder.typicode.com/posts?userId=${parentValue.id}`
           )
           .then((response) => response.data);
       },
