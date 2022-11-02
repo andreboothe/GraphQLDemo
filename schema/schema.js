@@ -1,5 +1,11 @@
 const graphql = require('graphql');
-const { GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLSchema } = graphql;
+const {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLInt,
+  GraphQLSchema,
+  GraphQLList,
+} = graphql;
 const axios = require('axios');
 
 const CompanyType = new GraphQLObjectType({
@@ -32,6 +38,16 @@ const AddressType = new GraphQLObjectType({
   },
 });
 
+const PostsType = new GraphQLObjectType({
+  name: 'Post',
+  fields: {
+    userId: { type: GraphQLString },
+    id: { type: GraphQLString },
+    title: { type: GraphQLString },
+    body: { type: GraphQLString },
+  },
+});
+
 const UserType = new GraphQLObjectType({
   name: 'User',
   fields: {
@@ -41,6 +57,17 @@ const UserType = new GraphQLObjectType({
     email: { type: GraphQLString },
     company: { type: CompanyType },
     address: { type: AddressType },
+    posts: {
+      type: GraphQLList(PostsType),
+      args: { userId: { type: GraphQLString } },
+      resolve(parentValue, args) {
+        return axios
+          .get(
+            `https://jsonplaceholder.typicode.com/posts?userId=${args.userId}`
+          )
+          .then((response) => response.data);
+      },
+    },
   },
 });
 

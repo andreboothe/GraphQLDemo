@@ -1,2 +1,3 @@
 # GraphQLDemo
-to run enter node dev in terminal
+
+to run enter npm run dev in terminal
