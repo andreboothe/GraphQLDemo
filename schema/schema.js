@@ -8,6 +8,7 @@ const {
   GraphQLNonNull,
 } = graphql;
 const axios = require('axios');
+const fetch = require('node-fetch');
 
 const CompanyType = new GraphQLObjectType({
   name: 'Company',
@@ -127,22 +128,30 @@ const mutation = new GraphQLObjectType({
         body: { type: GraphQLNonNull(GraphQLString) },
       },
       resolve(parentValue, { userId, title, body }) {
-        axios
-          .post(`https://jsonplaceholder.typicode.com/posts`, {
-            params: {
-              userId,
-              title,
-              body,
-            },
-          })
-          .then((response) => console.log(response.data));
         return axios
           .post(`https://jsonplaceholder.typicode.com/posts`, {
-            params: {
-              userId,
-              title,
-              body,
-            },
+            userId,
+            title,
+            body,
+          })
+          .then((response) => response.data);
+      },
+    },
+    editPost: {
+      type: PostType,
+      args: {
+        userId: { type: GraphQLNonNull(GraphQLString) },
+        title: { type: GraphQLNonNull(GraphQLString) },
+        body: { type: GraphQLNonNull(GraphQLString) },
+        id: { type: GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parentValue, { userId, title, body, id }) {
+        return axios
+          .put(`https://jsonplaceholder.typicode.com/posts/${id}`, {
+            userId,
+            title,
+            body,
+            id,
           })
           .then((response) => response.data);
       },
