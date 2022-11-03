@@ -49,7 +49,7 @@ const CommentType = new GraphQLObjectType({
   },
 });
 
-const PostsType = new GraphQLObjectType({
+const PostType = new GraphQLObjectType({
   name: 'Post',
   fields: {
     userId: { type: GraphQLString },
@@ -79,7 +79,7 @@ const UserType = new GraphQLObjectType({
     company: { type: CompanyType },
     address: { type: AddressType },
     posts: {
-      type: GraphQLList(PostsType),
+      type: GraphQLList(PostType),
       resolve(parentValue, args) {
         return axios
           .get(`https://jsonplaceholder.typicode.com/posts`, {
@@ -100,6 +100,15 @@ const RootQuery = new GraphQLObjectType({
       resolve(parentValue, args) {
         return axios
           .get(`https://jsonplaceholder.typicode.com/users/${args.id}`)
+          .then((response) => response.data);
+      },
+    },
+    post: {
+      type: PostType,
+      args: { id: { type: GraphQLString } },
+      resolve(parentValue, args) {
+        return axios
+          .get(`https://jsonplaceholder.typicode.com/posts/${args.id}`)
           .then((response) => response.data);
       },
     },
