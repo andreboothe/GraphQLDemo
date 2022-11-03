@@ -5,6 +5,7 @@ const {
   GraphQLInt,
   GraphQLSchema,
   GraphQLList,
+  GraphQLNonNull,
 } = graphql;
 const axios = require('axios');
 
@@ -115,4 +116,38 @@ const RootQuery = new GraphQLObjectType({
   },
 });
 
-module.exports = new GraphQLSchema({ query: RootQuery });
+const mutation = new GraphQLObjectType({
+  name: 'Mutations',
+  fields: {
+    addPost: {
+      type: PostType,
+      args: {
+        userId: { type: GraphQLNonNull(GraphQLString) },
+        title: { type: GraphQLNonNull(GraphQLString) },
+        body: { type: GraphQLNonNull(GraphQLString) },
+      },
+      resolve(parentValue, { userId, title, body }) {
+        axios
+          .post(`https://jsonplaceholder.typicode.com/posts`, {
+            params: {
+              userId,
+              title,
+              body,
+            },
+          })
+          .then((response) => console.log(response.data));
+        return axios
+          .post(`https://jsonplaceholder.typicode.com/posts`, {
+            params: {
+              userId,
+              title,
+              body,
+            },
+          })
+          .then((response) => response.data);
+      },
+    },
+  },
+});
+
+module.exports = new GraphQLSchema({ query: RootQuery, mutation: mutation });
